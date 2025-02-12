@@ -1,9 +1,9 @@
 package usecases
 
 import (
-	"auth-service/models"
-	"auth-service/pkg/db_service"
 	"fmt"
+	"go-jwt-microservice-template/models"
+	"go-jwt-microservice-template/pkg/db_service"
 )
 
 func Migrate() {

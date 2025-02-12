@@ -1,13 +1,10 @@
-module auth-service
+module go-jwt-microservice-template
 
 go 1.23.0
 
 require (
-	github.com/aws/aws-sdk-go v1.55.6
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
-	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/slavaWins/videoto_ts_forhosting_go v0.0.4
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
 )
