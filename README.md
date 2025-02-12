@@ -8,7 +8,9 @@
 
 Базовая биба с проверкой авторизии jwt, для микросервиса. Нужная минималка есть чтоб бы не выносить себе мозги и сразу делать бизнесовое 
 
-    go get github.com/slavaWins/go-jwt-microservice-template  
+    go get -u github.com/slavaWins/go-jwt-microservice-template@master
+    go get -u github.com/slavaWins/go-jwt-microservice-template
+
 
 ## Example usage 
 

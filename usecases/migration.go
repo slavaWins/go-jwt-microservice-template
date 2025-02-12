@@ -2,8 +2,8 @@ package usecases
 
 import (
 	"fmt"
-	"go-jwt-microservice-template/models"
-	"go-jwt-microservice-template/pkg/db_service"
+	"github.com/slavaWins/go-jwt-microservice-template/models"
+	"github.com/slavaWins/go-jwt-microservice-template/pkg/db_service"
 )
 
 func Migrate() {

@@ -4,7 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"go-jwt-microservice-template/models"
+	"github.com/slavaWins/go-jwt-microservice-template/models"
 	"net/http"
 	"os"
 	"strings"

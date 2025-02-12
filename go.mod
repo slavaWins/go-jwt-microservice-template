@@ -1,4 +1,4 @@
-module go-jwt-microservice-template
+module github.com/slavaWins/go-jwt-microservice-template
 
 go 1.23.0
 
