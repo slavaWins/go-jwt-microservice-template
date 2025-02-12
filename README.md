@@ -13,38 +13,48 @@
 
 
 
-    
-	gjmt_db_service.Connect()
-	gjmt_db_service.Migrate()
+Controller:
 
-## Example usage 
+    func GetUser(c *gin.Context) {
 
-
-
-    fmt.Println("Start")
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println(err)
-		fmt.Errorf("Не настроен env! %w", err)
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
 		return
 	}
 
-	db_service.Connect()
-	usecases.Migrate()
+	userIDUint, ok := userID.(uint)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+
+	user := gjmt_models.User{}
+	db := db_service.Connect()
+
+	if db.First(&user, userIDUint).Error != nil {
+		c.JSON(http.StatusNotFound, gjmt_models.NewErrorResponse("Error code id"))
+		return
+	}
+
+	c.JSON(http.StatusOK, gjmt_models.NewSuccessResponse(user))
+    }
+    
+
+Main
+
+	gjmt_db_service.Connect()
+	gjmt_db_service.Migrate()
+
+	db_service.Migrate()
 
 	r := gin.Default()
 
-	protected2 := r.Group("/")
-	protected2.Use(midlwares.RateLimitMiddleware(4))
-	{
-		protected2.POST("/login", controllers.LoginController)
-		protected2.POST("/code", controllers.CodeController)
-	}
-
 	protected := r.Group("/")
-	protected.Use(midlwares.AuthMiddleware())
+	protected.Use(gjmt_midlwares.AuthMiddleware())
 	{
 		protected.GET("/user", controllers.GetUser)
 	}
 
 	r.Run(":8081")
+ 
