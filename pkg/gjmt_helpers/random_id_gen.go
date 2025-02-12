@@ -1,4 +1,4 @@
-package pkg
+package gjmt_helpers
 
 import (
 	"crypto/sha256"

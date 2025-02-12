@@ -1,4 +1,4 @@
-package db_service
+package gjmt_db_service
 
 import (
 	"fmt"

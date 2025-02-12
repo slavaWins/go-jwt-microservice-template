@@ -1,4 +1,4 @@
-package midlwares
+package gjmt_midlwares
 
 import (
 	"github.com/gin-gonic/gin"

@@ -1,4 +1,4 @@
-package mail
+package gjmt_mail
 
 import (
 	"fmt"

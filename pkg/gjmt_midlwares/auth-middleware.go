@@ -1,10 +1,9 @@
-package midlwares
+package gjmt_midlwares
 
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/slavaWins/go-jwt-microservice-template/models"
 	"net/http"
 	"os"
 	"strings"
@@ -24,7 +23,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		claims := &models.Claims{}
+		claims := &gjmt_models.Claims{}
 
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtKey, nil

@@ -1,4 +1,4 @@
-package models
+package gjmt_models
 
 type Response[T any] struct {
 	Value     T      `json:"value,omitempty"`

@@ -12,6 +12,11 @@
     go get -u github.com/slavaWins/go-jwt-microservice-template
 
 
+
+    
+	gjmt_db_service.Connect()
+	gjmt_db_service.Migrate()
+
 ## Example usage 
 
 
