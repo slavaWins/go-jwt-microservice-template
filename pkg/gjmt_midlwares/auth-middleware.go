@@ -43,7 +43,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 
-			c.JSON(http.StatusNotFound, gjmt_models.NewErrorResponse("Authorization header is required"))
+			c.JSON(http.StatusUnauthorized, gjmt_models.NewErrorResponse("Authorization header is required"))
 			c.Abort()
 			return
 		}
@@ -56,7 +56,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusNotFound, gjmt_models.NewErrorResponse("Invalid auth token"))
+			c.JSON(http.StatusUnauthorized, gjmt_models.NewErrorResponse("Invalid auth token"))
 			c.Abort()
 			return
 		}
