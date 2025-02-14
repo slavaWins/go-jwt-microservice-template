@@ -3,19 +3,18 @@ package gjmt_midlwares
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v3"
 	"github.com/joho/godotenv"
 	"github.com/slavaWins/go-jwt-microservice-template/gjmt_models"
 	"github.com/slavaWins/go-jwt-microservice-template/pkg/gjmt_db_service"
-	"net/http"
 	"os"
 	"strings"
 )
 
-func GetAuthUser(c *gin.Context) (*gjmt_models.User, error) {
+func GetAuthUser(c fiber.Ctx) (*gjmt_models.User, error) {
 
-	userID, exists := c.Get("userID")
-	if !exists {
+	userID := c.Locals("userID")
+	if userID == nil {
 		return nil, errors.New("User ID not found in context")
 	}
 
@@ -34,18 +33,15 @@ func GetAuthUser(c *gin.Context) (*gjmt_models.User, error) {
 	return &user, nil
 }
 
-func AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware() fiber.Handler {
 
 	godotenv.Load()
 	var jwtKey = []byte(os.Getenv("APP_SECRET_KEY"))
 
-	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
+	return func(c fiber.Ctx) error {
+		authHeader := c.Get("Authorization")
 		if authHeader == "" {
-
-			c.JSON(http.StatusUnauthorized, gjmt_models.NewErrorResponse("Authorization header is required"))
-			c.Abort()
-			return
+			return c.Status(fiber.StatusUnauthorized).JSON(gjmt_models.ResponseWithError("Authorization header is required"))
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
@@ -56,14 +52,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gjmt_models.NewErrorResponse("Invalid auth token"))
-			c.Abort()
-			return
+			return c.Status(fiber.StatusUnauthorized).JSON(gjmt_models.ResponseWithError("Invalid auth token"))
 		}
 
-		c.Set("userID", claims.Id)
-		c.Set("Username", claims.Username)
+		// Устанавливаем значения в `Locals` для дальнейшего использования
+		c.Locals("userID", claims.Id)
+		c.Locals("Username", claims.Username)
 
-		c.Next()
+		return c.Next()
 	}
 }

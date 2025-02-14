@@ -15,46 +15,46 @@
 
 Controller:
 
-    func GetUser(c *gin.Context) {
-
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
-		return
+    func GetUser(c fiber.Ctx) error {
+	user, err := gjmt_midlwares.GetAuthUser(c)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(gjmt_models.ResponseWithError(err.Error()))
 	}
+	return c.Status(fiber.StatusOK).JSON(gjmt_models.ResponseWithValue(user))
 
-	userIDUint, ok := userID.(uint)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
-		return
-	}
-
-	user := gjmt_models.User{}
-	db := db_service.Connect()
-
-	if db.First(&user, userIDUint).Error != nil {
-		c.JSON(http.StatusNotFound, gjmt_models.NewErrorResponse("Error code id"))
-		return
-	}
-
-	c.JSON(http.StatusOK, gjmt_models.NewSuccessResponse(user))
     }
     
 
 Main
+
+    fmt.Println("============ Start ============ ")
+	fmt.Println(os.Getenv("APP_NAME"))
+	fmt.Println(os.Getenv("APP_PORT"))
+
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println(err)
+		fmt.Errorf("Не настроен env! %w", err)
+		return
+	}
 
 	gjmt_db_service.Connect()
 	gjmt_db_service.Migrate()
 
 	db_service.Migrate()
 
-	r := gin.Default()
+	r := fiber.New()
 
-	protected := r.Group("/")
-	protected.Use(gjmt_midlwares.AuthMiddleware())
-	{
-		protected.GET("/user", controllers.GetUser)
+	routes.ApiRoutes(r)
+
+	// Маршрут для Swagger-документации
+	if os.Getenv("APP_PRODUCTION") == "false" {
+		docs.SwaggerInfo.Title = os.Getenv("APP_NAME")
+
+		docs.SwaggerInfo.BasePath = os.Getenv("SWAGGER_USE_CUSTOM_BASEPATH")
+
+		r.Get("/swagger/*", swagger.HandlerDefault)
+		//r.Get("/swagger/*any", fiberSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
-	r.Run(":8081")
- 
+	log.Fatal(r.Listen(":" + os.Getenv("APP_PORT")))

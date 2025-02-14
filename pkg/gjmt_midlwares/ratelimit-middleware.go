@@ -1,14 +1,15 @@
 package gjmt_midlwares
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v3"
+	"github.com/slavaWins/go-jwt-microservice-template/gjmt_models"
 	"github.com/ulule/limiter/v3"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
 	"net/http"
 	"time"
 )
 
-func RateLimitMiddleware(requestsPerHour int) gin.HandlerFunc {
+func RateLimitMiddleware(requestsPerHour int) fiber.Handler {
 	// Создаем лимитер с указанным количеством запросов в час
 	rate := limiter.Rate{
 		//Period: time.Hour,
@@ -22,25 +23,22 @@ func RateLimitMiddleware(requestsPerHour int) gin.HandlerFunc {
 	// Создаем лимитер
 	limiterInstance := limiter.New(store, rate)
 
-	return func(c *gin.Context) {
+	return func(c fiber.Ctx) error {
 		// Получаем IP адрес клиента
-		ip := c.ClientIP()
+		ip := c.IP()
 
 		// Проверяем лимит для данного IP
-		context, err := limiterInstance.Get(c, ip)
+		context, err := limiterInstance.Get(c.Context(), ip)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-			c.Abort()
-			return
+			return c.Status(http.StatusInternalServerError).JSON(gjmt_models.ResponseWithError("Internal server error"))
 		}
 
 		if context.Reached {
-			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Превышено число попыток авторизации"})
-			c.Abort()
-			return
+			return c.Status(http.StatusTooManyRequests).JSON(gjmt_models.ResponseWithError("Превышено число попыток авторизации"))
 		}
 
 		// Продолжаем выполнение запроса
-		c.Next()
+		return c.Next()
+
 	}
 }
